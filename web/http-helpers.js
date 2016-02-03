@@ -14,8 +14,40 @@ exports.serveAssets = function(res, asset, callback) {
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
+  asset = asset === "/" ? "/index.html" : asset;
+  fs.readFile(archive.paths.siteAssets + asset, function(error, data){
+    if (error) {
+      fs.readFile(archive.paths.archivedSites + asset, function(error, data){
+      if (error) {
+        exports.sendResponse(res, "File not found", 404);
+      } else {
+        exports.sendResponse(res, data, 200);
+      }
+      });
+      //Data has been found
+    } else {
+      exports.sendResponse(res, data, 200);
+    }
+  })
 };
 
 
 
 // As you progress, keep thinking about what helper functions you can put here!
+
+exports.sendResponse = function(res, data, statusCode){
+  res.writeHEad(statusCode, headers);
+  res.end(data);
+};
+
+exports.collectData = function(req, callback){
+  var body = '';
+  req.on('data', function(chunk) {
+    body += chunk;
+  });
+  
+  req.on('end', function() {
+    body = body.split("=")[1] + "\n";
+    callback(body);
+  });
+}
