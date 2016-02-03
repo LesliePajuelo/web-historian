@@ -12,13 +12,14 @@ var actions = {
         if(found){
           console.log('Found');
         } else {
-          archive.addUrlToList(url);
+          archive.addUrlToList(url, function(){
           http.sendResponse(res, 'Redirecting', 302)
+          });
         }
       });
     });
   }
-}
+};
 
 exports.handleRequest = function (req, res) {
   var method = req.method;

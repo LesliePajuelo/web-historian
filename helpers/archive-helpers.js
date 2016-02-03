@@ -41,7 +41,7 @@ exports.isUrlInList = function(url, callback){
   });
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(url, callback){
   fs.appendFile(exports.paths.list, url, "utf-8", function(error){
     if(error){
       console.log('Could not add url');
@@ -51,8 +51,24 @@ exports.addUrlToList = function(){
   });
 };
 
-exports.isUrlArchived = function(){
+exports.isUrlArchived = function(url, callback){
+  fs.readFile(exports.paths.archivedSites + '/' + url, function(error, data) {
+    if (error) callback(false);
+    else callback(true);
+  });
 };
 
 exports.downloadUrls = function(){
+  for (var i = 0; i < urlArray.length; i++) {
+    var url = urlArray[i];
+    http.get({ hostname: url }, function(res) {
+      var body = '';
+      res.on('data', function(chunk) { body += chunk });
+      res.on('end', function() {
+        fs.writeFile(exports.paths.archivedSites + '/' + url, body, function(err) {
+          if (err) console.log('Could not archive ' + url);
+        });
+      });
+    });
+  }
 };
