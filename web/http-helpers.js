@@ -36,7 +36,7 @@ exports.serveAssets = function(res, asset, callback) {
 // As you progress, keep thinking about what helper functions you can put here!
 
 exports.sendResponse = function(res, data, statusCode){
-  res.writeHEad(statusCode, headers);
+  res.writeHead(statusCode, headers);
   res.end(data);
 };
 
@@ -45,9 +45,15 @@ exports.collectData = function(req, callback){
   req.on('data', function(chunk) {
     body += chunk;
   });
-  
+
   req.on('end', function() {
-    body = body.split("=")[1] + "\n";
+    body = body.split("=")[1];
     callback(body);
   });
-}
+};
+
+exports.redirect = function(res, url){
+  headers['Location'] = url;
+  res.writeHead(302, headers);
+  res.end();
+};
